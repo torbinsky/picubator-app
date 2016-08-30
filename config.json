@@ -1,0 +1,12 @@
+{
+  "sensor": {
+    "type": "2302",
+    "pinNum": 4
+  },
+  "orechstrate": {
+  },
+  "heat": {
+    "powerControlPinNum": 23
+  },
+  "tempShutoffThreshold": 26
+}
