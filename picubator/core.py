@@ -1,38 +1,62 @@
 import time
 from datetime import datetime
 import json
+import logging
+import logging.config
+import os
 
-import heater
-import sensor
+# Load logging config before our modules so we configure those modules' logging as well
+logging.config.fileConfig('logging_config.ini')
 
-# Initialize logging
-logging.basicConfig(level=logging.INFO)
+from heater import Heater
+from sensor import Sensor
+from iotdash import Dash
+
 logger = logging.getLogger(__name__)
 
-# Load application config file
-logger.info('Loading configuration...')
-with open('config.json', 'r') as f:
-    config = json.load(f)
+def main():
+    global sensor, heater, dash
+    # Load application config file
+    logger.info('Loading configuration...')
+    config_path = os.environ.get('PICUBATOR_CONFIG', 'config.json')
+    with open(config_path, 'r') as f:
+        config = json.load(f)
 
-# Initialize state from config settings
-logger.debug('Initializing state...')
-sensor.init(config['sensor.type'], config['sensor.pinNum'])
-heater.init(config['heat.powerControlPinNum'])
-logger.info('Initialization complete')
+    # Initialize state from config settings
+    logger.debug('Initializing state...')
+    sensor = Sensor(config['sensor']['type'], config['sensor']['pinNum'])
+    heater = Heater(config['heat']['powerControlPinNum'])
+    dash = Dash(config['adafruitio']['key'])
+    logger.info('Initialization complete')
 
-def do_main_program():
     logger.debug('Running...')
     while True:
-        logger.debug('Reading temp,humidity...')
-        humidity, temp = sensor.read()
-        logger.debug('Temp[%s] Humidity[%s]', temp, humidity)
-
-        # Turn the heat off if we hit threshold temp, on otherwise
-        if(temp > threshold):
-            heater.off()
+        if(dash.read_toggle()):
+            run_on()
         else:
-            heater.on()
+            run_off()
 
-        #record_reading(humidity, temp)
+def run_off():
+    logger.debug('Picubator is toggled off')
+    time.sleep(2)
 
-        time.sleep(10)
+def run_on():
+    logger.debug('Reading temp,humidity...')
+    humidity, temp = sensor.read()
+    logger.debug('Temp[%s] Humidity[%s]', temp, humidity)
+
+    threshold = dash.read_threshold()
+    logger.debug('Temperature threshold is %s', threshold)
+
+    # Turn the heat off if we hit threshold temp, on otherwise
+    if(temp > threshold):
+        heater.off()
+    else:
+        heater.on()
+
+    dash.record(temp, humidity)
+
+    time.sleep(10)
+
+if __name__ == '__main__':
+    main()

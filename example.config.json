@@ -3,7 +3,8 @@
     "type": "2302",
     "pinNum": 4
   },
-  "orechstrate": {
+  "adafruitio": {
+    "key": "#########"
   },
   "heat": {
     "powerControlPinNum": 23
