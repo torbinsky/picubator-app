@@ -6,7 +6,8 @@ import logging.config
 import os
 
 # Load logging config before our modules so we configure those modules' logging as well
-logging.config.fileConfig('logging_config.ini')
+log_config_path = os.path.join(os.path.dirname(__file__), '../logging_config.ini')
+logging.config.fileConfig(log_config_path)
 
 from heater import Heater
 from sensor import Sensor
