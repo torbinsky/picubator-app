@@ -146,7 +146,7 @@ class PicubatorDaemon(Daemon):
 
 if __name__ == "__main__":
     temp_dir = tempfile.gettempdir()
-    daemon = PicubatorDaemon(os.path.join(temp_dir, '/picubator.pid'))
+    daemon = PicubatorDaemon(os.path.join(temp_dir, 'picubator.pid'))
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:
             daemon.start()
