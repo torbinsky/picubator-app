@@ -26,7 +26,7 @@ def main():
     logger.debug('Initializing state...')
     sensor = Sensor(config['sensor']['type'], config['sensor']['pinNum'])
     heater = Heater(config['heat']['powerControlPinNum'])
-    dash = Dash(config['adafruitio']['key'])
+    dash = Dash(key=config['adafruitio']['key'], temp_feed=config['adafruitio']['temperatureFeedName'], humidity_feed=config['adafruitio']['humidityFeedName'], toggle_feed=config['adafruitio']['mainToggleFeedName'], threshold_feed=config['adafruitio']['temperatureThresholdFeedName'])
     logger.info('Initialization complete')
 
     logger.debug('Running...')

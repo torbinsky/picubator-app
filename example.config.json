@@ -4,10 +4,13 @@
     "pinNum": 4
   },
   "adafruitio": {
-    "key": "#########"
+    "key": "#########",
+    "temperatureFeedName": "picubator-temperature",
+    "humidityFeedName": "picubator-humidity",
+    "temperatureThresholdFeedName": "picubator-threshold",
+    "mainToggleFeedName": "picubator-toggle"
   },
   "heat": {
     "powerControlPinNum": 23
-  },
-  "tempShutoffThreshold": 26
+  }
 }
