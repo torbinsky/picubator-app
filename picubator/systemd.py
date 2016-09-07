@@ -23,3 +23,5 @@ if __name__ == '__main__':
         main()
     elif('noop' in sys.argv):
         ready()
+    else:
+        sys.exit(1)
