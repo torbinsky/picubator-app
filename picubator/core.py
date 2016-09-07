@@ -15,7 +15,7 @@ from iotdash import Dash
 
 logger = logging.getLogger(__name__)
 
-def main():
+def init():
     global sensor, heater, dash
     # Load application config file
     logger.info('Loading configuration...')
@@ -31,6 +31,8 @@ def main():
     logger.info('Initialization complete')
 
     logger.debug('Running...')
+
+def main():
     while True:
         if(dash.read_toggle()):
             run_on()

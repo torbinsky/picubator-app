@@ -3,16 +3,11 @@
 import sys, os, time, atexit
 from signal import SIGTERM
 import tempfile
+from core import init, main
 
 def run_daemon():
-    if os.environ.get('PICUBATOR_NOOP_DAEMON', 'OFF') == 'ON':
-        while True:
-            print 'WARNING: no-op daemon enabled!!!'
-            time.sleep(5)
-    else:
-        # Typically want to put imports at top, but that causes issues in non-ARM environments
-        from core import main
-        main()
+    init()
+    main()
 
 # Original source for the "Daemon" class found at: http://stackoverflow.com/questions/10217067/implementing-a-full-python-unix-style-daemon-processs
 class Daemon:
