@@ -16,6 +16,7 @@ class Sensor:
 
     def __init__(self, sensor_type, sensor_pin):
         self.sensor_type = sensor_types[sensor_type]
+        self.sensor_pin = sensor_pin
 
     def read(self):
         humidity, temp = Adafruit_DHT.read_retry(self.sensor_type, self.sensor_pin)

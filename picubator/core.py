@@ -41,6 +41,7 @@ def main():
 
 def run_off():
     logger.debug('Picubator is toggled off')
+    heater.off() # Make sure the heater is off!
     time.sleep(2)
 
 def run_on():
