@@ -8,7 +8,8 @@
     "temperatureFeedName": "picubator-temperature",
     "humidityFeedName": "picubator-humidity",
     "temperatureThresholdFeedName": "picubator-threshold",
-    "mainToggleFeedName": "picubator-toggle"
+    "mainToggleFeedName": "picubator-toggle",
+    "statusFeedName": "picubator-status"
   },
   "heat": {
     "powerControlPinNum": 23

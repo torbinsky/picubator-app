@@ -1,5 +1,4 @@
 import time
-from datetime import datetime
 import json
 import logging
 import logging.config
@@ -27,7 +26,8 @@ def init():
     logger.debug('Initializing state...')
     sensor = Sensor(config['sensor']['type'], config['sensor']['pinNum'])
     heater = Heater(config['heat']['powerControlPinNum'])
-    dash = Dash(key=config['adafruitio']['key'], temp_feed=config['adafruitio']['temperatureFeedName'], humidity_feed=config['adafruitio']['humidityFeedName'], toggle_feed=config['adafruitio']['mainToggleFeedName'], threshold_feed=config['adafruitio']['temperatureThresholdFeedName'])
+    dash = Dash(key=config['adafruitio']['key'], temp_feed=config['adafruitio']['temperatureFeedName'], humidity_feed=config['adafruitio']['humidityFeedName'], toggle_feed=config['adafruitio']['mainToggleFeedName'], threshold_feed=config['adafruitio']['temperatureThresholdFeedName'],status_feed=config['adafruitio']['statusFeedName'])
+    dash.send_status("Picubator connected.")
     logger.info('Initialization complete')
 
     logger.debug('Running...')
@@ -42,7 +42,7 @@ def main():
 def run_off():
     logger.debug('Picubator is toggled off')
     heater.off() # Make sure the heater is off!
-    time.sleep(2)
+    time.sleep(5)
 
 def run_on():
     logger.debug('Reading temp,humidity...')
@@ -60,7 +60,7 @@ def run_on():
 
     dash.record(temp, humidity)
 
-    time.sleep(10)
+    time.sleep(5)
 
 if __name__ == '__main__':
     main()

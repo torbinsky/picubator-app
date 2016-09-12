@@ -32,3 +32,7 @@ class Dash:
         threshold = self.client.receive(self.threshold_feed).value
         logger.debug("Threshold is %s", threshold)
         return int(threshold)
+
+    def send_status(self, msg):
+        logger.debug("Status: %s", msg)
+        self.client.send(self.status_feed, msg)
