@@ -22,16 +22,19 @@ class Brain:
             logger.warn("Error count[%s] exceeds 10, heat is off for safe mode", self.error_count)
             return False
 
+        overheat = self.heating_up and ((self.target_temp + 0.5) > self.current_temp)
+        underheat = (not self.heating_up) and ((self.target_temp - 0.5) < self.current_temp)
+
         # If we're heating up, then allow some above threshold overshoot
-        if (self.target_temp + 0.5) > self.current_temp:
+        if overheat or not underheat:
             logger.info("Heating up with 0.5 overshoot. target[%s], current_temp[%s]", self.target_temp, self.current_temp)
             return True
         # Alternatively, if we're cooling down, allow some below threshold
-        elif (not self.heating_up) and ((self.target_temp - 0.5) < self.current_temp):
+        elif underheat:
             logger.info("Cooling down with 0.5 undershoot. target[%s], current_temp[%s]", self.target_temp, self.current_temp)
             return False
         else:
-            logger.info("It's getting too hot! Cooling down.")
+            logger.info("It's getting too hot[%s]! Cooling down.", self.current_temp)
             return False
 
     def report_temp(self, temp):
