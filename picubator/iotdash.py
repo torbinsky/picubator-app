@@ -8,7 +8,8 @@ class Dash:
     'Represents an Adafruit IO Dashboard which gives input/output capabilities'
 
     def __init__(self, key, temp_feed='picubator-temperature', humidity_feed='picubator-humidity',
-                toggle_feed='picubator-toggle', threshold_feed='picubator-threshold', status_feed='picubator-status'
+                toggle_feed='picubator-toggle', threshold_feed='picubator-threshold', status_feed='picubator-status',
+                heater_status_feed='picubator-heater-status'
                 ):
         logger.debug("Initializing Adafruit IO client...")
         self.client = Client(key)
@@ -17,7 +18,14 @@ class Dash:
         self.toggle_feed = toggle_feed
         self.threshold_feed = threshold_feed
         self.status_feed = status_feed
+        self.heater_status_feed = heater_status_feed
         logger.debug("Adafruit IO client initialized")
+
+    def heater_status(self, heating):
+        if heating:
+            self.client.send(self.heater_status_feed, "#ff0000")
+        else:
+            self.client.send(self.heater_status_feed, "#ffffff")
 
     def record(self, temp, humidity):
         logger.debug("temp[%s] rh[%s]", temp, humidity)

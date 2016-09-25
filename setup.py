@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='picubator',
-      version='0.1.0',
+      version='0.2.0',
       description='Python Incubator Application',
       author='Torben Werner',
       author_email='torbinsky@gmail.com',

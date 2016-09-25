@@ -30,7 +30,7 @@ def init():
     logger.debug('Initializing state...')
     sensor = Sensor(config['sensor']['type'], config['sensor']['pinNum'])
     heater = Heater(config['heat']['powerControlPinNum'])
-    dash = Dash(key=config['adafruitio']['key'], temp_feed=config['adafruitio']['temperatureFeedName'], humidity_feed=config['adafruitio']['humidityFeedName'], toggle_feed=config['adafruitio']['mainToggleFeedName'], threshold_feed=config['adafruitio']['temperatureThresholdFeedName'],status_feed=config['adafruitio']['statusFeedName'])
+    dash = Dash(key=config['adafruitio']['key'], temp_feed=config['adafruitio']['temperatureFeedName'], humidity_feed=config['adafruitio']['humidityFeedName'], toggle_feed=config['adafruitio']['mainToggleFeedName'], threshold_feed=config['adafruitio']['temperatureThresholdFeedName'],status_feed=config['adafruitio']['statusFeedName'], heater_status_feed=config['adafruitio']['heaterStatusFeedName'])
     dash.send_status("Picubator connected.")
     logger.info('Initialization complete')
 
@@ -77,6 +77,7 @@ def run_on():
 
     try:
         brain.target_temp = dash.read_threshold()
+        dash.heater_status(heater.heating)
         logger.debug('Temperature threshold is %s', brain.target_temp)
     except Exception:
         pass
