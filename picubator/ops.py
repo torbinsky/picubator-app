@@ -26,7 +26,7 @@ class Brain:
         underheat = (not self.heating_up) and ((self.target_temp - 0.5) < self.current_temp)
 
         # If we're heating up, then allow some above threshold overshoot
-        if overheat or not underheat:
+        if overheat:
             logger.info("Heating up with 0.5 overshoot. target[%s], current_temp[%s]", self.target_temp, self.current_temp)
             return True
         # Alternatively, if we're cooling down, allow some below threshold
