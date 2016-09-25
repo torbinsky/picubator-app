@@ -11,16 +11,20 @@ logging.config.fileConfig(log_config_path)
 from heater import Heater
 from sensor import Sensor
 from iotdash import Dash
+from ops import Brain
 
 logger = logging.getLogger(__name__)
 
 def init():
-    global sensor, heater, dash
+    global sensor, heater, dash, brain
+
     # Load application config file
     logger.info('Loading configuration...')
     config_path = os.environ.get('PICUBATOR_CONFIG', 'config.json')
     with open(config_path, 'r') as f:
         config = json.load(f)
+
+    brain = Brain()
 
     # Initialize state from config settings
     logger.debug('Initializing state...')
@@ -33,32 +37,55 @@ def init():
     logger.debug('Running...')
 
 def main():
+    toggle_on = False
+    online = False
     while True:
-        if(dash.read_toggle()):
+        try:
+            toggle_on = dash.read_toggle()
+        except Exception:
+            logger.warn("Encountered exception communicating with dash")
+            pass
+
+        if(toggle_on):
             run_on()
+            if(online):
+                dash.send_status("Picubator mode is now ONLINE.")
+            online = True
         else:
             run_off()
+            if(not online):
+                dash.send_status("Picubator mode is now STAND_BY.")
+            online = False
 
 def run_off():
     logger.debug('Picubator is toggled off')
     heater.off() # Make sure the heater is off!
+    brain.reset()
     time.sleep(5)
 
 def run_on():
     logger.debug('Reading temp,humidity...')
     humidity, temp = sensor.read()
     logger.debug('Temp[%s] Humidity[%s]', temp, humidity)
+    brain.report_temp(temp)
 
-    threshold = dash.read_threshold()
-    logger.debug('Temperature threshold is %s', threshold)
+    try:
+        brain.target_temp = dash.read_threshold()
+        logger.debug('Temperature threshold is %s', brain.target_temp)
+    except Exception:
+        pass
 
     # Turn the heat off if we hit threshold temp, on otherwise
-    if(temp > threshold):
-        heater.off()
-    else:
+    if(brain.should_heat()):
         heater.on()
+    else:
+        heater.off()
 
-    dash.record(temp, humidity)
+    # Attempt to update our iot dashboard
+    try:
+        dash.record(temp, humidity)
+    except Exception:
+        pass
 
     time.sleep(5)
 
