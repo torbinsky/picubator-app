@@ -15,6 +15,7 @@ class Brain:
         self.current_temp = -1
         self.heating_up = True
         self.error_count = 0
+        self.goal_temp = 0
 
     def should_heat(self):
         # Don't heat if our error count gets too high
@@ -22,20 +23,7 @@ class Brain:
             logger.warn("Error count[%s] exceeds 10, heat is off for safe mode", self.error_count)
             return False
 
-        overheat = self.heating_up and ((self.target_temp + 0.5) > self.current_temp)
-        underheat = (not self.heating_up) and ((self.target_temp - 0.5) < self.current_temp)
-
-        # If we're heating up, then allow some above threshold overshoot
-        if overheat or not underheat:
-            logger.info("Heating up with 0.5 overshoot. target[%s], current_temp[%s]", self.target_temp, self.current_temp)
-            return True
-        # Alternatively, if we're cooling down, allow some below threshold
-        elif underheat:
-            logger.info("Cooling down with 0.5 undershoot. target[%s], current_temp[%s]", self.target_temp, self.current_temp)
-            return False
-        else:
-            logger.info("It's getting too hot[%s]! Cooling down.", self.current_temp)
-            return False
+        return self.current_temp < self.goal_temp
 
     def report_temp(self, temp):
         logger.info("Received a report of temperature: %s", temp)
@@ -54,12 +42,14 @@ class Brain:
 
         if temp > self.current_temp:
             # heating up
-            logger.info("Report indicates I am heating up.")
+            logger.info("Report indicates I am heating up. I'll allow a 0.5 target overshoot.")
             self.heating_up = True
+            self.goal_temp = self.target_temp + 0.5
         elif temp < self.current_temp:
             # cooling down
-            logger.info("Report indicates I am cooling down.")
+            logger.info("Report indicates I am cooling down. I'll allow a 0.5 target undershoot.")
             self.heating_up = False
+            self.goal_temp = self.target_temp - 0.5
 
         # Update our last known temperature
         self.current_temp = temp
