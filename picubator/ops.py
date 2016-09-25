@@ -47,16 +47,16 @@ class Brain:
                 logger.warn("Received suspicious temperature [%s], ignoring report")
                 self.error_count += 1
                 return
-            else:
+            elif self.error_count > 0:
                 # reset error count
-                logger.debug("Temp is reasonable, resetting error count")
+                logger.info("Temp is reasonable, resetting error count")
                 self.error_count = 0
 
-        if(temp > self.current_temp):
+        if temp > self.current_temp:
             # heating up
             logger.info("Report indicates I am heating up.")
             self.heating_up = True
-        else:
+        elif temp < self.current_temp:
             # cooling down
             logger.info("Report indicates I am cooling down.")
             self.heating_up = False
