@@ -47,14 +47,20 @@ def main():
             pass
 
         if(toggle_on):
-            run_on()
             if(not online):
-                dash.send_status("Picubator mode is now ONLINE.")
+                try:
+                    dash.send_status("Picubator mode is now ONLINE.")
+                except Exception:
+                    pass
+            run_on()
             online = True
         else:
-            run_off()
             if(online):
-                dash.send_status("Picubator mode is now STAND_BY.")
+                try:
+                    dash.send_status("Picubator mode is now STAND_BY.")
+                except Exception:
+                    pass
+            run_off()
             online = False
 
 def run_off():
