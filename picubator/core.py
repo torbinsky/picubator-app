@@ -75,13 +75,6 @@ def run_on():
     logger.debug('Temp[%s] Humidity[%s]', temp, humidity)
     brain.report_temp(temp)
 
-    try:
-        brain.target_temp = dash.read_threshold()
-        dash.heater_status(heater.heating)
-        logger.debug('Temperature threshold is %s', brain.target_temp)
-    except Exception:
-        pass
-
     # Turn the heat off if we hit threshold temp, on otherwise
     if(brain.should_heat()):
         heater.on()
@@ -90,6 +83,9 @@ def run_on():
 
     # Attempt to update our iot dashboard
     try:
+        brain.target_temp = dash.read_threshold()
+        dash.heater_status(heater.heating)
+        logger.debug('Temperature threshold is %s', brain.target_temp)
         dash.record(temp, humidity)
     except Exception:
         pass
