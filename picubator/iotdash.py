@@ -9,7 +9,7 @@ class Dash:
 
     def __init__(self, key, temp_feed='picubator-temperature', humidity_feed='picubator-humidity',
                 toggle_feed='picubator-toggle', threshold_feed='picubator-threshold', status_feed='picubator-status',
-                heater_status_feed='picubator-heater-status'
+                heater_status_feed='picubator-heater-status', camera_feed='picubator-camera'
                 ):
         logger.debug("Initializing Adafruit IO client...")
         self.client = Client(key)
@@ -19,6 +19,7 @@ class Dash:
         self.threshold_feed = threshold_feed
         self.status_feed = status_feed
         self.heater_status_feed = heater_status_feed
+        self.camera_feed = camera_feed
         logger.debug("Adafruit IO client initialized")
 
     def heater_status(self, heating):
@@ -31,6 +32,10 @@ class Dash:
         logger.debug("temp[%s] rh[%s]", temp, humidity)
         self.client.send(self.temp_feed, temp)
         self.client.send(self.humidity_feed, humidity)
+
+    def send_image(self, b64_image):
+        logger.debug("sending image to dash")
+        self.client.send(self.camera_feed, b64_image)
 
     def read_toggle(self):
         toggle_state = self.client.receive(self.toggle_feed).value

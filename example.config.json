@@ -9,9 +9,14 @@
     "humidityFeedName": "picubator-humidity",
     "temperatureThresholdFeedName": "picubator-threshold",
     "mainToggleFeedName": "picubator-toggle",
-    "statusFeedName": "picubator-status"
+    "statusFeedName": "picubator-status",
+    "cameraFeedName": "picubator-camera"
   },
   "heat": {
     "powerControlPinNum": 23
+  },
+  "camera": {
+    "xRes": 1024,
+    "yRes": 720
   }
 }

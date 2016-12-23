@@ -12,11 +12,12 @@ from heater import Heater
 from sensor import Sensor
 from iotdash import Dash
 from ops import Brain
+from camera import Camera
 
 logger = logging.getLogger(__name__)
 
 def init():
-    global sensor, heater, dash, brain
+    global sensor, heater, dash, brain, camera
 
     # Load application config file
     logger.info('Loading configuration...')
@@ -30,7 +31,8 @@ def init():
     logger.debug('Initializing state...')
     sensor = Sensor(config['sensor']['type'], config['sensor']['pinNum'])
     heater = Heater(config['heat']['powerControlPinNum'])
-    dash = Dash(key=config['adafruitio']['key'], temp_feed=config['adafruitio']['temperatureFeedName'], humidity_feed=config['adafruitio']['humidityFeedName'], toggle_feed=config['adafruitio']['mainToggleFeedName'], threshold_feed=config['adafruitio']['temperatureThresholdFeedName'],status_feed=config['adafruitio']['statusFeedName'], heater_status_feed=config['adafruitio']['heaterStatusFeedName'])
+    camera = Camera(config['camera']['xRes'], config['camera']['yRes'])
+    dash = Dash(key=config['adafruitio']['key'], temp_feed=config['adafruitio']['temperatureFeedName'], humidity_feed=config['adafruitio']['humidityFeedName'], toggle_feed=config['adafruitio']['mainToggleFeedName'], threshold_feed=config['adafruitio']['temperatureThresholdFeedName'],status_feed=config['adafruitio']['statusFeedName'], heater_status_feed=config['adafruitio']['heaterStatusFeedName'], camera_feed=config['adafruitio']['cameraFeedName'])
     dash.send_status("Picubator connected.")
     logger.info('Initialization complete')
 
