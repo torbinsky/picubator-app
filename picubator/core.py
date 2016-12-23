@@ -32,7 +32,7 @@ def init():
     sensor = Sensor(config['sensor']['type'], config['sensor']['pinNum'])
     heater = Heater(config['heat']['powerControlPinNum'])
     camera = Camera(config['camera']['xRes'], config['camera']['yRes'])
-    dash = Dash(key=config['adafruitio']['key'], temp_feed=config['adafruitio']['temperatureFeedName'], humidity_feed=config['adafruitio']['humidityFeedName'], toggle_feed=config['adafruitio']['mainToggleFeedName'], threshold_feed=config['adafruitio']['temperatureThresholdFeedName'],status_feed=config['adafruitio']['statusFeedName'], heater_status_feed=config['adafruitio']['heaterStatusFeedName'], camera_feed=config['adafruitio']['cameraFeedName'])
+    dash = Dash(key=config['adafruitio']['key'], temp_feed=config['adafruitio']['temperatureFeedName'], humidity_feed=config['adafruitio']['humidityFeedName'], toggle_feed=config['adafruitio']['mainToggleFeedName'], threshold_feed=config['adafruitio']['temperatureThresholdFeedName'],status_feed=config['adafruitio']['statusFeedName'], heater_status_feed=config['adafruitio']['heaterStatusFeedName'], camera_feed=config['adafruitio']['camera_feed_name'])
     dash.send_status("Picubator connected.")
     logger.info('Initialization complete')
 
