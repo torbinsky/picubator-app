@@ -19,6 +19,7 @@ class Camera:
     def capture_base64():
         # Byte stream for camera capture
         img_stream = BytesIO()
+        logger.debug('Capturing image...')
         self.cam_api.capture(img_stream, format='jpeg')
         img_stream.seek(0)
 
@@ -30,4 +31,4 @@ class Camera:
         return base64.b64encode(img_buf)
 
     def __del__(self):
-        logger.debug("Cleaning up GPIO state")
+        logger.debug("Finished")
