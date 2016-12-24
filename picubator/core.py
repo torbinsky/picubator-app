@@ -90,7 +90,8 @@ def run_on():
         logger.debug('Temperature threshold is %s', brain.target_temp)
         dash.record(temp, humidity)
         logger.debug('Sending camera capture to dash...')
-        dash.send_image(camera.capture_base64())
+        if(brain.should_image()):
+            dash.send_image(camera.capture_base64())
         logger.debug("Finished main run loop.")
     except Exception:
         pass

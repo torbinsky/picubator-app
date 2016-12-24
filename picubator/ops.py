@@ -1,5 +1,5 @@
 import logging
-
+import time
 
 # Initialize logging
 logger = logging.getLogger(__name__)
@@ -16,6 +16,18 @@ class Brain:
         self.heating_up = True
         self.error_count = 0
         self.goal_temp = 0
+        self.time_to_next_image = 0
+        self.min_seconds_between_images = 60
+
+    def should_image(self):
+        current_time = time.time()
+        if(current_time > self.time_to_next_image):
+            logger.debug("Yes, we should image")
+            self.time_to_next_image = current_time + self.min_seconds_between_images
+            return True
+        else:
+            logger.debug("No, we shouldn't image until %s", self.time_to_next_image)
+            return False
 
     def should_heat(self):
         # Don't heat if our error count gets too high
