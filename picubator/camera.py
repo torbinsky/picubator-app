@@ -16,7 +16,7 @@ class Camera:
 
         logger.info('Camera initalized at resolution %sx%s', x_res, y_res)
 
-    def capture_base64():
+    def capture_base64(self):
         # Byte stream for camera capture
         img_stream = BytesIO()
         logger.debug('Capturing image...')
