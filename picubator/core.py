@@ -18,6 +18,9 @@ from transitions import Machine
 logger = logging.getLogger(__name__)
 
 class Unit(Machine):
+    'The main unit of the picubator'
+    
+    states = ['ONLINE','OFFLINE']
     
     def turned_on(self):
         logger.info('Picubator turned ON')
@@ -28,7 +31,7 @@ class Unit(Machine):
         self.dash.send_status("Picubator is OFF")
     
     def __init__(self):
-        Machine.__init__(self, ['ONLINE','OFFLINE'], initial='OFFLINE')
+        Machine.__init__(self, states, initial='OFFLINE')
         # New transitions
         self.add_transition('on', ['OFFLINE'], 'ONLINE', after='turned_on')
         self.add_transition('off',  ['ONLINE'], 'OFFLINE', after='turned_off')
