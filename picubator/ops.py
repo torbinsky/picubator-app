@@ -14,14 +14,18 @@ class Brain(Machine):
         Machine.__init__(self, states=Brain.states, initial='standby')
         # Trigger 'report_error' always goes to error state
         self.add_transition('report_error','*','error')
-        self.add_transition('heat_up', ['standby','cooling'], 'heating', 
+        self.add_transition('heat_up', ['standby','cooling', 'heating'], 'heating', 
         before='before_heat_up')
-        self.add_transition('cool_down', ['standby','heating'], 'cooling',
+        self.add_transition('cool_down', ['standby','heating', 'cooling'], 'cooling',
         before='before_cool_down')
+        # Only a valid report trigger can get us to transition out of error
         self.add_transition('report_valid', 'error', 'standby')
+        # All other triggers keep us in error
         self.add_transition('*','error','error')
+        # Valid reports are allowed in other states, but don't do any transition
         self.add_transition('report_valid', 'heating', 'heating')
         self.add_transition('report_valid', 'cooling', 'cooling')
+        self.add_transition('report_valid', 'standby', 'standby')
         self.reset()
 
     def reset(self):
@@ -43,9 +47,14 @@ class Brain(Machine):
             return False
 
     def should_heat(self):
+        # We should heat only if we are in the heating state
         return self.is_heating()
         
     def set_target(self, target):
+        # noop for same temp
+        if(self.target_temp == target):
+            return
+        
         self.target_temp = target
         # Default to cooling down, but we will evaluate after to check what we
         # should really do
