@@ -10,21 +10,36 @@ logger = logging.getLogger(__name__)
 class Camera:
     'Represents a camera which will take stills'
 
-    def __init__(self, x_res, y_res):
+    def __init__(self, x_res, y_res, light):
         self.cam_api = PiCamera()
         self.cam_api.resolution = (x_res, y_res)
+        self.light = light
 
         logger.info('Camera initalized at resolution %sx%s', x_res, y_res)
 
     def capture_base64(self):
-        # Byte stream for camera capture
-        img_stream = BytesIO()
-        logger.debug('Capturing image...')
-        self.cam_api.capture(img_stream, format='jpeg')
-        img_stream.seek(0)
-
+        # Remember the light's original state
+        # TW: This will be an issue if things become concurrent
+        lightWasOff = self.light.isOn()
+        
+        # Safely turn the light on and take a picture
+        try:
+            # Turn on the light
+            self.light.on()
+            
+            # Byte stream for camera capture
+            img_stream = BytesIO()
+            logger.debug('Capturing image...')
+            self.cam_api.capture(img_stream, format='jpeg')
+        except:
+            # Turn the light back off, if it was already off
+            if(lightWasOff):
+                self.light.off()
+        
         # bytes into an array
+        img_stream.seek(0)
         img_buf = img_stream.read()
+        
         # cleanup resources
         img_stream.close()
 

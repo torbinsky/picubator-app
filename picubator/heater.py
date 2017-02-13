@@ -27,6 +27,9 @@ class Heater:
         logger.debug('HEAT OFF')
         io.output(self.power_pin, io.LOW)
         self.heating = False
+    
+    def isOn(self):
+        return self.heating
 
     def __del__(self):
         logger.debug("Cleaning up GPIO state")

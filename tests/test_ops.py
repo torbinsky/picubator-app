@@ -55,6 +55,17 @@ class TestOps(unittest.TestCase):
         self.assertEqual(brain.should_heat(), True)
         brain.report_temp(21)
         self.assertEqual(brain.should_heat(), False)
+    
+    def test_reset(self):
+        brain = Brain()
+        brain.set_target(37)
+        brain.report_temp(15)
+        self.assertEqual(brain.should_heat(), True)
+        self.assertEqual(brain.state, 'heating')
+        brain.report_temp(30)
+        brain.set_target(30)
+        brain.reset()
+        self.test_initial_state()
         
     def test_error_mode(self):
         brain = Brain()

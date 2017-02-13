@@ -19,9 +19,11 @@ class Brain(Machine):
         self.add_transition('cool_down', ['standby','heating', 'cooling'], 'cooling',
         before='before_cool_down')
         # Only a valid report trigger can get us to transition out of error
+        #
         self.add_transition('report_valid', 'error', 'standby')
         # All other triggers keep us in error
-        self.add_transition('*','error','error')
+        self.add_transition('cool_down','error','error')
+        self.add_transition('heat_up','error','error')
         # Valid reports are allowed in other states, but don't do any transition
         self.add_transition('report_valid', 'heating', 'heating')
         self.add_transition('report_valid', 'cooling', 'cooling')
