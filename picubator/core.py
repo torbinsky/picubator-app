@@ -30,7 +30,7 @@ class Unit(Machine):
         logger.info('Picubator turned OFF')
         self.dash.send_status("Picubator is OFF")
     
-    def __init__(self):
+    def __init__(self,brain,camera,sensor,heater,dash):
         Machine.__init__(self, states, initial='OFFLINE')
         # New transitions
         self.add_transition('on', ['OFFLINE'], 'ONLINE', after='turned_on')
@@ -38,24 +38,6 @@ class Unit(Machine):
         # Allowed to transition to same state
         self.add_transition('on', ['ONLINE'], 'ONLINE')
         self.add_transition('off',  ['OFFLINE'], 'OFFLINE')
-    
-        # Load application config file
-        logger.info('Loading configuration...')
-        config_path = os.environ.get('PICUBATOR_CONFIG', 'config.json')
-        with open(config_path, 'r') as f:
-            config = json.load(f)
-    
-        self.brain = Brain()
-    
-        # Initialize state from config settings
-        logger.debug('Initializing state...')
-        self.sensor = Sensor(config['sensor']['type'], config['sensor']['pinNum'])
-        self.heater = Heater(config['heat']['powerControlPinNum'])
-        self.camera = Camera(config['camera']['xRes'], config['camera']['yRes'], self.heater)
-        self.dash = Dash(key=config['adafruitio']['key'], temp_feed=config['adafruitio']['temperatureFeedName'], humidity_feed=config['adafruitio']['humidityFeedName'], toggle_feed=config['adafruitio']['mainToggleFeedName'], threshold_feed=config['adafruitio']['temperatureThresholdFeedName'],status_feed=config['adafruitio']['statusFeedName'], heater_status_feed=config['adafruitio']['heaterStatusFeedName'], camera_feed=config['adafruitio']['cameraFeedName'])
-        self.dash.send_status("Picubator connected.")
-        logger.info('Initialization complete')
-        logger.debug('Running...')
     
     def run_cycle(self):
         if self.state == 'ONLINE':
@@ -68,8 +50,7 @@ class Unit(Machine):
     def run_off(self):
         self.heater.off() # Make sure the heater is off!
         self.brain.reset()
-        time.sleep(5)
-    
+        
     def run_on(self):
         logger.debug('Reading temp,humidity...')
         humidity, temp = self.sensor.read()
@@ -94,21 +75,43 @@ class Unit(Machine):
             logger.debug("Finished main run loop.")
         except Exception:
             pass
-        
-        time.sleep(5)
-
+    
 def main():
-    unit = Unit()
+    # Load application config file
+    logger.info('Loading configuration...')
+    config_path = os.environ.get('PICUBATOR_CONFIG', 'config.json')
+    with open(config_path, 'r') as f:
+        config = json.load(f)
+    
+    # Initialize state from config settings
+    logger.debug('Initializing state...')
+    brain = Brain()
+    sensor = Sensor(config['sensor']['type'], config['sensor']['pinNum'])
+    heater = Heater(config['heat']['powerControlPinNum'])
+    camera = Camera(config['camera']['xRes'], config['camera']['yRes'], heater)
+    dash = Dash(key=config['adafruitio']['key'], temp_feed=config['adafruitio']['temperatureFeedName'], humidity_feed=config['adafruitio']['humidityFeedName'], toggle_feed=config['adafruitio']['mainToggleFeedName'], threshold_feed=config['adafruitio']['temperatureThresholdFeedName'],status_feed=config['adafruitio']['statusFeedName'], heater_status_feed=config['adafruitio']['heaterStatusFeedName'], camera_feed=config['adafruitio']['cameraFeedName'])
+    dash.send_status("Picubator connected.")
+    unit = Unit(brain,camera,sensor,heater,dash)
+    logger.info('Initialization complete')
+    
+    # main loop
     while True:
+        # Safely try to do things
         try:
+            # update unit on/off with dash toggle
             if dash.read_toggle():
                 unit.on()
             else:
                 unit.off()
         except:
+            # If we hit an error, log and turn the unit off
             logger.error("Encountered an error, turning off!")
             unit.off()
+        
+        # run the main unit cycle
         unit.run_cycle()
+        # slow the roll
+        time.sleep(5)
     
 if __name__ == '__main__':
     main()
