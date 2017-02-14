@@ -29,7 +29,7 @@ class Camera:
     def capture_base64(self):
         # Remember the light's original state
         # TW: This will be an issue if things become concurrent
-        lightWasOff = self.light.isOn()
+        lightWasOff = not self.light.isOn()
         
         # Safely turn the light on and take a picture
         try:
@@ -40,7 +40,7 @@ class Camera:
             img_stream = BytesIO()
             logger.debug('Capturing image...')
             self.cam_api.capture(img_stream, format='jpeg')
-        except:
+        finally:
             # Turn the light back off, if it was already off
             if(lightWasOff):
                 self.light.off()
