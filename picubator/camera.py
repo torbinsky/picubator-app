@@ -1,7 +1,16 @@
 import logging
 
 from io import BytesIO
-from picamera import PiCamera
+try:
+    from picamera import PiCamera
+except:
+    print(
+    '-------------------------------------------------------------------------')
+    print(
+    ' WARNING: Unable to import PiCamera library.')
+    print(
+    '-------------------------------------------------------------------------')
+    
 import base64
 
 # Initialize logging
@@ -10,8 +19,8 @@ logger = logging.getLogger(__name__)
 class Camera:
     'Represents a camera which will take stills'
 
-    def __init__(self, x_res, y_res, light):
-        self.cam_api = PiCamera()
+    def __init__(self, x_res, y_res, light, cam_api = None):
+        self.cam_api = cam_api or PiCamera()
         self.cam_api.resolution = (x_res, y_res)
         self.light = light
 

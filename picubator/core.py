@@ -3,17 +3,13 @@ import json
 import logging
 import logging.config
 import os
+from transitions import Machine
 
 # Load logging config before our modules so we configure those modules' logging as well
 log_config_path = os.path.join(os.path.dirname(__file__), '../logging_config.ini')
 logging.config.fileConfig(log_config_path)
 
-from heater import Heater
-from sensor import Sensor
-from iotdash import Dash
-from ops import Brain
-from camera import Camera
-from transitions import Machine
+from picubator import Heater, Sensor, Dash, Brain, Camera
 
 logger = logging.getLogger(__name__)
 
@@ -28,31 +24,58 @@ class Unit(Machine):
     
     def turned_off(self):
         logger.info('Picubator turned OFF')
-        self.dash.send_status("Picubator is OFF")
+        self.brain.reset()
+        # Attempt to update dash status, but ignore errors
+        try:
+            self.dash.send_status("Picubator is OFF")
+        except:
+            pass
     
     def __init__(self,brain,camera,sensor,heater,dash):
-        Machine.__init__(self, states, initial='OFFLINE')
+        Machine.__init__(self, states=Unit.states, initial='OFFLINE')
         # New transitions
         self.add_transition('on', ['OFFLINE'], 'ONLINE', after='turned_on')
         self.add_transition('off',  ['ONLINE'], 'OFFLINE', after='turned_off')
         # Allowed to transition to same state
         self.add_transition('on', ['ONLINE'], 'ONLINE')
         self.add_transition('off',  ['OFFLINE'], 'OFFLINE')
+        
+        self.brain = brain
+        self.camera = camera
+        self.sensor = sensor
+        self.heater = heater
+        self.dash = dash
     
     def run_cycle(self):
-        if self.state == 'ONLINE':
-            logger.debug('Picubator running an online cycle')
-            self.run_on()
-        elif self.state == 'OFFLINE':
-            logger.debug('Picubator running an offline cycle')
-            self.run_off()
+        # Safely try to update on/off from the dash toggle
+        try:
+            # update unit on/off from dash toggle
+            if self.dash.read_toggle():
+                self.on()
+            else:
+                self.off()
+        except:
+            # If we hit an error, log and turn the unit off
+            logger.exception("Error during dash toggle read, turning off!")
+            self.off()
+        
+        # Safely try to do the next run operations
+        try:    
+            if self.is_ONLINE():
+                logger.debug('Picubator running an online cycle')
+                self.run_on()
+            else:
+                logger.debug('Picubator running an offline cycle')
+                self.run_off()
+        except:
+            # If we hit an error, log and turn the unit off
+            logger.exception("Error during run on/off")
     
     def run_off(self):
         self.heater.off() # Make sure the heater is off!
-        self.brain.reset()
         
     def run_on(self):
-        logger.debug('Reading temp,humidity...')
+        logger.debug('Starting ON run cycle...')
         humidity, temp = self.sensor.read()
         logger.debug('Temp[%s] Humidity[%s]', temp, humidity)
         self.brain.report_temp(temp)
@@ -64,18 +87,19 @@ class Unit(Machine):
             self.heater.off()
     
         # Attempt to update our iot dashboard
-        try:
-            self.brain.set_target(self.dash.read_threshold())
-            self.dash.heater_status(self.heater.heating)
-            logger.debug('Temperature threshold is %s', self.brain.target_temp)
-            self.dash.record(temp, humidity)
+        # Update target temp from dash
+        self.brain.set_target(self.dash.read_threshold())
+        logger.debug('Temperature threshold is %s', self.brain.target_temp)
+        
+        # Update dashboard heater status
+        self.dash.heater_status(self.heater.heating)
+        self.dash.record(temp, humidity)
+        
+        # Do image capture
+        if(self.brain.should_image()):
             logger.debug('Sending camera capture to dash...')
-            if(self.brain.should_image()):
-                self.dash.send_image(self.camera.capture_base64())
-            logger.debug("Finished main run loop.")
-        except Exception:
-            pass
-    
+            self.dash.send_image(self.camera.capture_base64())
+
 def main():
     # Load application config file
     logger.info('Loading configuration...')
@@ -96,20 +120,8 @@ def main():
     
     # main loop
     while True:
-        # Safely try to do things
-        try:
-            # update unit on/off with dash toggle
-            if dash.read_toggle():
-                unit.on()
-            else:
-                unit.off()
-        except:
-            # If we hit an error, log and turn the unit off
-            logger.error("Encountered an error, turning off!")
-            unit.off()
-        
         # run the main unit cycle
-        unit.run_cycle()
+        unit.run_cyle()
         # slow the roll
         time.sleep(5)
     

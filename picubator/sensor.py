@@ -1,15 +1,23 @@
 import logging
 
-import Adafruit_DHT
+try:
+    import Adafruit_DHT
+    sensor_types = {
+        '11': Adafruit_DHT.DHT11,
+        '22': Adafruit_DHT.DHT22,
+        '2302': Adafruit_DHT.AM2302
+    }
+except ImportError:
+    print(
+    '-------------------------------------------------------------------------')
+    print(
+    ' WARNING: Unable to import Adafruit_DHT library.')
+    print(
+    '-------------------------------------------------------------------------')
 
 # Initialize logging
 logger = logging.getLogger(__name__)
 
-sensor_types = {
-    '11': Adafruit_DHT.DHT11,
-    '22': Adafruit_DHT.DHT22,
-    '2302': Adafruit_DHT.AM2302
-}
 
 class Sensor:
     'Represents a DHT type sensor that can provide temperature/humidity readings'

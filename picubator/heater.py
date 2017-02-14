@@ -1,6 +1,14 @@
 import logging
 
-import RPi.GPIO as io
+try:
+    import RPi.GPIO as io
+except ImportError:
+    print(
+    '-------------------------------------------------------------------------')
+    print(
+    ' WARNING: Unable to import RPi.GPIO library.')
+    print(
+    '-------------------------------------------------------------------------')
 
 # Initialize logging
 logger = logging.getLogger(__name__)

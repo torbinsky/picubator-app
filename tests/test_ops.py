@@ -1,7 +1,5 @@
 from picubator.ops import Brain
 
-from random import randint
-
 import unittest
 
 class TestOps(unittest.TestCase):

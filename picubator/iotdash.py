@@ -1,6 +1,14 @@
 import logging
 
-from Adafruit_IO import Client
+try:
+    from Adafruit_IO import Client
+except ImportError:
+    print(
+    '-------------------------------------------------------------------------')
+    print(
+    ' WARNING: Unable to import Adafruit_IO library.')
+    print(
+    '-------------------------------------------------------------------------')
 
 logger = logging.getLogger(__name__)
 
@@ -9,10 +17,11 @@ class Dash:
 
     def __init__(self, key, temp_feed='picubator-temperature', humidity_feed='picubator-humidity',
                 toggle_feed='picubator-toggle', threshold_feed='picubator-threshold', status_feed='picubator-status',
-                heater_status_feed='picubator-heater-status', camera_feed='picubator-camera'
+                heater_status_feed='picubator-heater-status', camera_feed='picubator-camera',
+                client = None
                 ):
         logger.debug("Initializing Adafruit IO client...")
-        self.client = Client(key)
+        self.client = client or Client(key)
         self.temp_feed = temp_feed
         self.humidity_feed = humidity_feed
         self.toggle_feed = toggle_feed
