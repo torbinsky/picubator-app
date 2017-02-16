@@ -107,6 +107,7 @@ class Unit(Machine):
             self.dash.send_image(self.camera.capture_base64())
 
 def init():
+    global unit
     # Load application config file
     logger.info('Loading configuration...')
     config_path = os.environ.get('PICUBATOR_CONFIG', 'config.json')
@@ -125,6 +126,7 @@ def init():
     logger.info('Initialization complete')
     
 def main():
+    global unit
     # Initialize unit if needed
     if not unit:
         init()
