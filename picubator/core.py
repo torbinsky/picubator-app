@@ -9,9 +9,15 @@ from transitions import Machine
 log_config_path = os.path.join(os.path.dirname(__file__), '../logging_config.ini')
 logging.config.fileConfig(log_config_path)
 
-from picubator import Heater, Sensor, Dash, Brain, Camera
+from heater import Heater
+from sensor import Sensor
+from camera import Camera
+from ops import Brain
+from iotdash import Dash
 
 logger = logging.getLogger(__name__)
+
+unit = None
 
 class Unit(Machine):
     'The main unit of the picubator'
@@ -100,7 +106,7 @@ class Unit(Machine):
             logger.debug('Sending camera capture to dash...')
             self.dash.send_image(self.camera.capture_base64())
 
-def main():
+def init():
     # Load application config file
     logger.info('Loading configuration...')
     config_path = os.environ.get('PICUBATOR_CONFIG', 'config.json')
@@ -117,6 +123,11 @@ def main():
     dash.send_status("Picubator connected.")
     unit = Unit(brain,camera,sensor,heater,dash)
     logger.info('Initialization complete')
+    
+def main():
+    # Initialize unit if needed
+    if not unit:
+        init()
     
     # main loop
     while True:

@@ -1,4 +1,4 @@
-from picubator.camera import Camera
+from picubator import Camera
 
 import unittest
 from mock import Mock
