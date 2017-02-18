@@ -64,7 +64,7 @@ class Unit(Machine):
             self.off()
         
         # Safely try to do the next run operations
-        try:    
+        try:
             if self.is_ONLINE():
                 logger.debug('Picubator running an online cycle')
                 self.run_on()
@@ -89,7 +89,7 @@ class Unit(Machine):
             self.heater.on()
         else:
             self.heater.off()
-    
+        
         # Attempt to update our iot dashboard
         # Update target temp from dash
         self.brain.set_target(self.dash.read_threshold())
