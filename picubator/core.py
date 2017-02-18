@@ -131,7 +131,7 @@ def main(unit=None):
     # main loop
     while True:
         # run the main unit cycle
-        unit.run_cyle()
+        unit.run_cycle()
         # slow the roll
         time.sleep(5)
     

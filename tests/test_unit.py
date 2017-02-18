@@ -6,7 +6,7 @@ class TestOps(unittest.TestCase):
  
     def setUp(self):
         pass
- 
+
     @patch("picubator.Dash")
     @patch("picubator.Camera")
     @patch("picubator.Heater")
