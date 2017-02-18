@@ -77,13 +77,13 @@ class Unit(Machine):
     
     def run_off(self):
         self.heater.off() # Make sure the heater is off!
-        
+
     def run_on(self):
         logger.debug('Starting ON run cycle...')
         humidity, temp = self.sensor.read()
         logger.debug('Temp[%s] Humidity[%s]', temp, humidity)
         self.brain.report_temp(temp)
-    
+        
         # Turn the heat off if we hit threshold temp, on otherwise
         if self.brain.should_heat():
             self.heater.on()
