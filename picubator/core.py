@@ -17,8 +17,6 @@ from iotdash import Dash
 
 logger = logging.getLogger(__name__)
 
-unit = None
-
 class Unit(Machine):
     'The main unit of the picubator'
     
@@ -107,7 +105,6 @@ class Unit(Machine):
             self.dash.send_image(self.camera.capture_base64())
 
 def init():
-    global unit
     # Load application config file
     logger.info('Loading configuration...')
     config_path = os.environ.get('PICUBATOR_CONFIG', 'config.json')
@@ -124,12 +121,12 @@ def init():
     dash.send_status("Picubator connected.")
     unit = Unit(brain,camera,sensor,heater,dash)
     logger.info('Initialization complete')
+    return unit
     
-def main():
-    global unit
+def main(unit=None):
     # Initialize unit if needed
-    if not unit:
-        init()
+    if unit is None:
+        unit = init()
     
     # main loop
     while True:

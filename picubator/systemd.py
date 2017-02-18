@@ -14,13 +14,13 @@ if __name__ == '__main__':
         # in non-ARM environments
         from core import init, main
         # Initialize service
-        init()
+        unit = init()
 
         # We are ready
         ready()
 
         # Begin main loop
-        main()
+        main(unit)
     elif('noop' in sys.argv):
         ready()
     else:
